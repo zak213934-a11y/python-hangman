@@ -52,6 +52,8 @@ def create_release_archive(version: str, output_dir: Path, allow_dirty: bool) ->
 
 
 def main() -> None:
+    """Parse CLI arguments and create a release archive."""
+
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("version", help="Version label for the release archive (e.g. v1.0.0)")
     parser.add_argument(
