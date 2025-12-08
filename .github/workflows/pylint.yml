@@ -29,7 +29,9 @@ jobs:
           # format code
           black $files || true
           # apply ruff simple fixes
-          ruff --fix $files || true
+          - name: Run Ruff
+          run: ruff check .
+  # If you want fixing, use ruff format . or update Ruff and use --fix if supported
           # show any changes
           git --no-pager diff --name-only || true
         fi
