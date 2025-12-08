@@ -1,7 +1,7 @@
 """Utility to package the repository into a versioned release archive.
 
-The script uses ``git archive`` to produce a zip file of the current ``HEAD``
-revision. It defaults to storing the archive under ``releases/`` and refuses to
+The script uses ``git archive`` to produce a zip file of the selected git
+reference. It defaults to storing the archive under ``releases/`` and refuses to
 run if there are uncommitted changes unless ``--allow-dirty`` is supplied.
 """
 
