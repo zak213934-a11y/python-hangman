@@ -1,8 +1,10 @@
 """Utility to package the repository into a versioned release archive.
 
 The script uses ``git archive`` to produce a zip file of the selected git
-reference. It defaults to storing the archive under ``releases/`` and refuses to
-run if there are uncommitted changes unless ``--allow-dirty`` is supplied.
+reference. By default it targets ``HEAD`` and writes to ``releases/``, but you
+can override the location with ``--output-dir`` and choose any tag or branch via
+``--ref``. It refuses to run if there are uncommitted changes unless
+``--allow-dirty`` is supplied.
 """
 
 from __future__ import annotations
