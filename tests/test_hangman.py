@@ -11,6 +11,8 @@ from hangman import HangmanGame, choose_word, load_words_from_file
 
 
 def test_hangman_game_win_flow() -> None:
+    """Verify a perfect set of guesses wins without consuming attempts."""
+
     game = HangmanGame("code", allowed_attempts=6)
     for letter in "code":
         assert game.guess(letter) is True
@@ -20,6 +22,8 @@ def test_hangman_game_win_flow() -> None:
 
 
 def test_hangman_game_duplicate_guess_raises() -> None:
+    """Ensure repeating a guess raises a ValueError."""
+
     game = HangmanGame("python", allowed_attempts=6)
     game.guess("p")
     with pytest.raises(ValueError):
@@ -30,6 +34,8 @@ def test_hangman_game_duplicate_guess_raises() -> None:
 
 
 def test_guess_requires_single_alpha_character() -> None:
+    """Reject guesses that are not a single alphabetic character."""
+
     game = HangmanGame("test")
     for invalid in ("", "ab", "1", "!", "abc"):
         with pytest.raises(ValueError):
@@ -37,12 +43,16 @@ def test_guess_requires_single_alpha_character() -> None:
 
 
 def test_choose_word_uses_rng() -> None:
+    """Pick a deterministic word when seeded RNG is provided."""
+
     rng = random.Random(123)
     word = choose_word(["alpha", "beta", "gamma"], rng)
     assert word == "alpha"
 
 
 def test_load_words_from_file_filters_non_alpha(tmp_path: Path) -> None:
+    """Keep only alphabetic words from a provided file."""
+
     content = "Alpha\nBeta\n123\n \nGamma!\n"
     word_file = tmp_path / "words.txt"
     word_file.write_text(content, encoding="utf-8")
@@ -52,6 +62,8 @@ def test_load_words_from_file_filters_non_alpha(tmp_path: Path) -> None:
 
 
 def test_load_words_from_file_requires_words(tmp_path: Path) -> None:
+    """Fail when no alphabetic words are found in the file."""
+
     word_file = tmp_path / "empty.txt"
     word_file.write_text("123\n!@#\n", encoding="utf-8")
 

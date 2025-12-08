@@ -210,6 +210,8 @@ def print_game_state(game: HangmanGame) -> None:
 
 
 def main(argv: Sequence[str] | None = None) -> None:
+    """Run the Hangman game using optional CLI arguments."""
+
     parser = argparse.ArgumentParser(description="Play a game of Hangman.")
     parser.add_argument(
         "--word-file",
