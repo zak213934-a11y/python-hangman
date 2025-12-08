@@ -5,9 +5,6 @@ reference. By default it targets ``HEAD`` and writes to ``releases/``, but you
 can override the location with ``--output-dir`` and choose any tag or branch via
 ``--ref``. It refuses to run if there are uncommitted changes unless
 ``--allow-dirty`` is supplied.
-The script uses ``git archive`` to produce a zip file of the current ``HEAD``
-revision. It defaults to storing the archive under ``releases/`` and refuses to
-run if there are uncommitted changes unless ``--allow-dirty`` is supplied.
 """
 
 from __future__ import annotations
@@ -28,15 +25,15 @@ def ensure_clean_worktree() -> None:
         text=True,
     )
     if result.stdout.strip():
-        raise RuntimeError("Working tree is dirty; commit or stash changes before releasing.")
+        raise RuntimeError(
+            "Working tree is dirty; commit or stash changes before releasing."
+        )
 
 
 def create_release_archive(
     version: str, output_dir: Path, allow_dirty: bool, ref: str = "HEAD"
 ) -> Path:
     """Create a zip archive of the given repository revision.
-def create_release_archive(version: str, output_dir: Path, allow_dirty: bool) -> Path:
-    """Create a zip archive of the current repository ``HEAD``.
 
     Args:
         version: Version label used in the archive filename (e.g. ``v1.2.3``).
@@ -56,7 +53,6 @@ def create_release_archive(version: str, output_dir: Path, allow_dirty: bool) ->
 
     subprocess.run(
         ["git", "archive", "--format", "zip", "-o", str(archive_path), ref],
-        ["git", "archive", "--format", "zip", "-o", str(archive_path), "HEAD"],
         check=True,
     )
 
@@ -67,7 +63,9 @@ def main() -> None:
     """Parse CLI arguments and create a release archive."""
 
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("version", help="Version label for the release archive (e.g. v1.0.0)")
+    parser.add_argument(
+        "version", help="Version label for the release archive (e.g. v1.0.0)"
+    )
     parser.add_argument(
         "--ref",
         default="HEAD",
@@ -85,6 +83,7 @@ def main() -> None:
         help="Allow creating a release even when the working tree has uncommitted changes.",
     )
     args = parser.parse_args()
+
     try:
         archive_path = create_release_archive(
             args.version, args.output_dir, args.allow_dirty, ref=args.ref
@@ -92,10 +91,10 @@ def main() -> None:
     except subprocess.CalledProcessError as err:
         print(f"Failed to archive git reference '{args.ref}': {err}", file=sys.stderr)
         raise SystemExit(1) from err
+    except RuntimeError as err:
+        print(err, file=sys.stderr)
+        raise SystemExit(1) from err
 
-
-    args = parser.parse_args()
-    archive_path = create_release_archive(args.version, args.output_dir, args.allow_dirty)
     print(f"Release archive created at {archive_path}")
 
 
