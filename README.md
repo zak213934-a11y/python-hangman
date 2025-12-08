@@ -11,8 +11,21 @@ A simple command-line Hangman game written in Python.
 ## Options
 
 - `--word-file PATH`: Provide a newline-delimited list of words to draw from.
-- `--max-attempts N`: Override the number of allowed wrong guesses (default matches the hangman art).
-- `--seed N`: Supply a seed for deterministic word selection when testing.
+- `--attempts N`: Override the number of allowed wrong guesses (default matches the hangman art).
+
+## Building a distributable zipapp
+
+If network restrictions block installing PyInstaller, you can still ship a
+single-file archive that runs on any machine with Python 3 installed:
+
+```bash
+python build_pyz.py
+```
+
+The build places `dist/hangman.pyz` alongside the project. Launch it with
+`python dist/hangman.pyz [options]` and distribute that file to end users.
+The `dist/` directory is gitignored, so generate the archive locally when
+you need to ship it.
 
 ## Testing
 
