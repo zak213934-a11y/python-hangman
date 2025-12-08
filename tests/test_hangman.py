@@ -82,6 +82,7 @@ def test_cli_rejects_non_positive_attempts(tmp_path: Path) -> None:
         capture_output=True,
         text=True,
         cwd=tmp_path,
+        check=False,
     )
 
     assert result.returncode == 2
