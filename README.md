@@ -60,4 +60,3 @@ tooling first:
 ```bash
 pip install -r requirements-dev.txt
 ```
-change where the archive is stored.
