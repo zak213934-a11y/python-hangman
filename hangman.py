@@ -1,3 +1,26 @@
+"""Simple command-line Hangman game with configurable options.
+
+Run with ``python hangman.py`` and follow the prompts.
+"""
+
+from __future__ import annotations
+
+import argparse
+import random
+from pathlib import Path
+from typing import Iterable, Sequence
+
+HANGMAN_STAGES = [
+    r"""
+     +---+
+     |   |
+         |
+         |
+         |
+         |
+    =========
+    """,
+    r"""
 """Simple command-line Hangman game.
 
 Run with `python hangman.py` and follow the prompts.
@@ -26,6 +49,7 @@ HANGMAN_STAGES = [
          |
     =========
     """,
+    r"""
     """
      +---+
      |   |
@@ -35,6 +59,7 @@ HANGMAN_STAGES = [
          |
     =========
     """,
+    r"""
     """
      +---+
      |   |
@@ -44,6 +69,7 @@ HANGMAN_STAGES = [
          |
     =========
     """,
+    r"""
     """
      +---+
      |   |
@@ -53,6 +79,7 @@ HANGMAN_STAGES = [
          |
     =========
     """,
+    r"""
     """
      +---+
      |   |
@@ -62,6 +89,7 @@ HANGMAN_STAGES = [
          |
     =========
     """,
+    r"""
     """
      +---+
      |   |
@@ -73,6 +101,7 @@ HANGMAN_STAGES = [
     """,
 ]
 
+DEFAULT_WORDS = [
 WORDS = [
     "python",
     "hangman",
@@ -91,6 +120,39 @@ class HangmanGame:
     """Encapsulates game state and logic for Hangman."""
 
     def __init__(self, secret_word: str, allowed_attempts: int | None = None) -> None:
+        if not secret_word.isalpha():
+            raise ValueError("Secret word must contain only alphabetic characters.")
+
+        self.secret_word = secret_word.lower()
+        self.allowed_attempts = (
+            allowed_attempts if allowed_attempts is not None else len(HANGMAN_STAGES) - 1
+        )
+        if self.allowed_attempts <= 0:
+            raise ValueError("Allowed attempts must be positive.")
+
+        self.guessed_letters: set[str] = set()
+        self.wrong_guesses: set[str] = set()
+
+    @property
+    def remaining_attempts(self) -> int:
+        """Return how many attempts remain."""
+
+        return self.allowed_attempts - len(self.wrong_guesses)
+
+    def masked_word(self) -> str:
+        """Return the secret word with unguessed letters masked."""
+
+        return " ".join(
+            letter if letter in self.guessed_letters else "_" for letter in self.secret_word
+        )
+
+    def guess(self, letter: str) -> bool:
+        """Process a guess and return ``True`` when correct.
+
+        Raises:
+            ValueError: If the guess is invalid or already made.
+        """
+
         self.secret_word = secret_word.lower()
         self.allowed_attempts = allowed_attempts if allowed_attempts is not None else len(HANGMAN_STAGES) - 1
         self.guessed_letters: Set[str] = set()
@@ -119,6 +181,23 @@ class HangmanGame:
         return False
 
     def is_won(self) -> bool:
+        """Return whether the player has won."""
+
+        return all(letter in self.guessed_letters for letter in set(self.secret_word))
+
+    def is_lost(self) -> bool:
+        """Return whether the player has lost."""
+
+        return self.remaining_attempts <= 0
+
+    def game_over(self) -> bool:
+        """Return whether the game has concluded."""
+
+        return self.is_won() or self.is_lost()
+
+    def stage_art(self) -> str:
+        """Return the ASCII art for the current state."""
+
         return all(letter in self.guessed_letters for letter in set(self.secret_word))
 
     def is_lost(self) -> bool:
