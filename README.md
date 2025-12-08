@@ -46,4 +46,13 @@ python publish_release.py v1.0.0
 The script uses `git archive` to capture the repository state and writes the
 result to `releases/hangman-v1.0.0.zip`. It refuses to run if there are
 uncommitted changes unless you supply `--allow-dirty`. Use `--output-dir` to
+change where the archive is stored. To publish a specific tag or branch instead
+of `HEAD`, provide `--ref <git-ref>`.
+
+If you plan to lint or run the publishing workflow locally, install the dev
+tooling first:
+
+```bash
+pip install -r requirements-dev.txt
+```
 change where the archive is stored.
