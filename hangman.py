@@ -1,7 +1,4 @@
-"""Simple command-line Hangman game with configurable options.
-
-Run with ``python hangman.py`` and follow the prompts.
-"""
+"""Simple command-line Hangman game with configurable options."""
 
 from __future__ import annotations
 
@@ -21,26 +18,6 @@ HANGMAN_STAGES = [
     =========
     """,
     r"""
-"""Simple command-line Hangman game.
-
-Run with `python hangman.py` and follow the prompts.
-"""
-
-import random
-from typing import Iterable, Set
-
-
-HANGMAN_STAGES = [
-    """
-     +---+
-     |   |
-         |
-         |
-         |
-         |
-    =========
-    """,
-    """
      +---+
      |   |
      O   |
@@ -50,7 +27,6 @@ HANGMAN_STAGES = [
     =========
     """,
     r"""
-    """
      +---+
      |   |
      O   |
@@ -60,7 +36,6 @@ HANGMAN_STAGES = [
     =========
     """,
     r"""
-    """
      +---+
      |   |
      O   |
@@ -70,7 +45,6 @@ HANGMAN_STAGES = [
     =========
     """,
     r"""
-    """
      +---+
      |   |
      O   |
@@ -80,7 +54,6 @@ HANGMAN_STAGES = [
     =========
     """,
     r"""
-    """
      +---+
      |   |
      O   |
@@ -90,7 +63,6 @@ HANGMAN_STAGES = [
     =========
     """,
     r"""
-    """
      +---+
      |   |
      O   |
@@ -102,7 +74,6 @@ HANGMAN_STAGES = [
 ]
 
 DEFAULT_WORDS = [
-WORDS = [
     "python",
     "hangman",
     "algorithm",
@@ -153,19 +124,6 @@ class HangmanGame:
             ValueError: If the guess is invalid or already made.
         """
 
-        self.secret_word = secret_word.lower()
-        self.allowed_attempts = allowed_attempts if allowed_attempts is not None else len(HANGMAN_STAGES) - 1
-        self.guessed_letters: Set[str] = set()
-        self.wrong_guesses: Set[str] = set()
-
-    @property
-    def remaining_attempts(self) -> int:
-        return self.allowed_attempts - len(self.wrong_guesses)
-
-    def masked_word(self) -> str:
-        return " ".join(letter if letter in self.guessed_letters else "_" for letter in self.secret_word)
-
-    def guess(self, letter: str) -> bool:
         letter = letter.lower()
         if not letter.isalpha() or len(letter) != 1:
             raise ValueError("Guess must be a single alphabetic character.")
@@ -198,27 +156,41 @@ class HangmanGame:
     def stage_art(self) -> str:
         """Return the ASCII art for the current state."""
 
-        return all(letter in self.guessed_letters for letter in set(self.secret_word))
-
-    def is_lost(self) -> bool:
-        return self.remaining_attempts <= 0
-
-    def game_over(self) -> bool:
-        return self.is_won() or self.is_lost()
-
-    def stage_art(self) -> str:
         stage_index = min(len(self.wrong_guesses), len(HANGMAN_STAGES) - 1)
         return HANGMAN_STAGES[stage_index]
 
 
-def choose_word(word_list: Iterable[str]) -> str:
-    word_list = list(word_list)
-    if not word_list:
+def choose_word(word_list: Iterable[str], rng: random.Random | None = None) -> str:
+    """Choose a word from ``word_list`` using the provided ``rng`` if given."""
+
+    words = list(word_list)
+    if not words:
         raise ValueError("Word list cannot be empty.")
-    return random.choice(word_list)
+
+    chooser = rng if rng is not None else random
+    return chooser.choice(words)
+
+
+def load_words_from_file(path: Path | str) -> list[str]:
+    """Load words from a file, returning only alphabetic entries.
+
+    Raises:
+        ValueError: If no valid words are found.
+    """
+
+    file_path = Path(path)
+    lines = [line.strip() for line in file_path.read_text(encoding="utf-8").splitlines()]
+    words = [line for line in lines if line.isalpha()]
+
+    if not words:
+        raise ValueError("Word file does not contain any valid words.")
+
+    return words
 
 
 def prompt_for_guess() -> str:
+    """Prompt the user for a single-letter guess."""
+
     while True:
         entry = input("Guess a letter: ").strip().lower()
         if len(entry) == 1 and entry.isalpha():
@@ -227,6 +199,8 @@ def prompt_for_guess() -> str:
 
 
 def print_game_state(game: HangmanGame) -> None:
+    """Print the current Hangman state to the console."""
+
     print(game.stage_art())
     print(f"Word: {game.masked_word()}")
     if game.wrong_guesses:
@@ -235,9 +209,28 @@ def print_game_state(game: HangmanGame) -> None:
     print(f"Remaining attempts: {game.remaining_attempts}\n")
 
 
-def main() -> None:
-    secret_word = choose_word(WORDS)
-    game = HangmanGame(secret_word)
+def main(argv: Sequence[str] | None = None) -> None:
+    parser = argparse.ArgumentParser(description="Play a game of Hangman.")
+    parser.add_argument(
+        "--word-file",
+        type=Path,
+        help="Optional path to a file containing one word per line to use instead of defaults.",
+    )
+    parser.add_argument(
+        "--attempts",
+        type=int,
+        default=None,
+        help="Number of incorrect attempts allowed (default: depends on hangman stages).",
+    )
+    args = parser.parse_args(argv)
+
+    if args.word_file:
+        words = load_words_from_file(args.word_file)
+    else:
+        words = DEFAULT_WORDS
+
+    secret_word = choose_word(words)
+    game = HangmanGame(secret_word, allowed_attempts=args.attempts)
 
     print("Welcome to Hangman!\n")
 
