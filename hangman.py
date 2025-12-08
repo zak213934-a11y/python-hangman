@@ -214,6 +214,15 @@ def print_game_state(game: HangmanGame) -> None:
     print(f"Remaining attempts: {game.remaining_attempts}\n")
 
 
+def _positive_attempts(value: str) -> int:
+    """Argparse type ensuring attempt counts are positive integers."""
+
+    attempts = int(value)
+    if attempts <= 0:
+        raise argparse.ArgumentTypeError("attempts must be a positive integer")
+    return attempts
+
+
 def main(argv: Sequence[str] | None = None) -> None:
     """Run the Hangman game using optional CLI arguments."""
 
@@ -225,7 +234,7 @@ def main(argv: Sequence[str] | None = None) -> None:
     )
     parser.add_argument(
         "--attempts",
-        type=int,
+        type=_positive_attempts,
         default=None,
         help="Number of incorrect attempts allowed (default: depends on hangman stages).",
     )

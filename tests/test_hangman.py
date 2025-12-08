@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import random
 from pathlib import Path
+import subprocess
+import sys
 
 import pytest
 
@@ -69,3 +71,20 @@ def test_load_words_from_file_requires_words(tmp_path: Path) -> None:
 
     with pytest.raises(ValueError):
         load_words_from_file(word_file)
+
+
+def test_cli_rejects_non_positive_attempts(tmp_path: Path) -> None:
+    """Exit gracefully when provided a non-positive attempts value."""
+
+    script_path = Path(__file__).resolve().parent.parent / "hangman.py"
+    result = subprocess.run(
+        [sys.executable, str(script_path), "--attempts", "0"],
+        capture_output=True,
+        text=True,
+        cwd=tmp_path,
+        check=False,
+    )
+
+    assert result.returncode == 2
+    assert "attempts must be a positive integer" in result.stderr
+    assert "Traceback" not in result.stderr
