@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import argparse
 import subprocess
+import sys
 from pathlib import Path
 
 
@@ -76,9 +77,14 @@ def main() -> None:
         help="Allow creating a release even when the working tree has uncommitted changes.",
     )
     args = parser.parse_args()
-    archive_path = create_release_archive(
-        args.version, args.output_dir, args.allow_dirty, ref=args.ref
-    )
+    try:
+        archive_path = create_release_archive(
+            args.version, args.output_dir, args.allow_dirty, ref=args.ref
+        )
+    except subprocess.CalledProcessError as err:
+        print(f"Failed to archive git reference '{args.ref}': {err}", file=sys.stderr)
+        raise SystemExit(1) from err
+
     print(f"Release archive created at {archive_path}")
 
 

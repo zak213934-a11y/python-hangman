@@ -17,7 +17,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install pylint ruff black isort autoflake pytest
+        pip install -r requirements-dev.txt
     - name: Auto-fix Python code (autoflake, isort, black)
       run: |
         files=$(git ls-files '*.py')
@@ -32,7 +32,9 @@ jobs:
           git --no-pager diff --name-only || true
         fi
     - name: Run Ruff
-      run: ruff check .
+      run: |
+        ruff format .
+        ruff check .
     - name: Analysing the code with pylint
       run: |
         pylint $(git ls-files '*.py')
