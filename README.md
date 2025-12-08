@@ -2,6 +2,11 @@
 
 A simple command-line Hangman game written in Python.
 
+## Branching
+
+All prior feature branches have been consolidated. The `main` branch now tracks
+the up-to-date codebase and should be used for all future work.
+
 ## How to Play
 
 1. Run `python hangman.py`.
