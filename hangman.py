@@ -96,7 +96,9 @@ class HangmanGame:
 
         self.secret_word = secret_word.lower()
         self.allowed_attempts = (
-            allowed_attempts if allowed_attempts is not None else len(HANGMAN_STAGES) - 1
+            allowed_attempts
+            if allowed_attempts is not None
+            else len(HANGMAN_STAGES) - 1
         )
         if self.allowed_attempts <= 0:
             raise ValueError("Allowed attempts must be positive.")
@@ -114,7 +116,8 @@ class HangmanGame:
         """Return the secret word with unguessed letters masked."""
 
         return " ".join(
-            letter if letter in self.guessed_letters else "_" for letter in self.secret_word
+            letter if letter in self.guessed_letters else "_"
+            for letter in self.secret_word
         )
 
     def guess(self, letter: str) -> bool:
@@ -179,7 +182,9 @@ def load_words_from_file(path: Path | str) -> list[str]:
     """
 
     file_path = Path(path)
-    lines = [line.strip() for line in file_path.read_text(encoding="utf-8").splitlines()]
+    lines = [
+        line.strip() for line in file_path.read_text(encoding="utf-8").splitlines()
+    ]
     words = [line for line in lines if line.isalpha()]
 
     if not words:
