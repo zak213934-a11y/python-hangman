@@ -83,7 +83,7 @@ def main() -> None:
 
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
-        "version", help="Version label for the release archive (e.g. v1.0.0)"
+        "version", help="Version label for the release archive (e.g. v1.1.0)"
     )
     parser.add_argument(
         "--ref",

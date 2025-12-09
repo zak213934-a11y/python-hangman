@@ -50,16 +50,16 @@ python -m pytest
 Create a zip of the current `HEAD` revision with:
 
 ```bash
-python publish_release.py v1.0.0
+python publish_release.py v1.1.0
 ```
 
 The script uses `git archive` to capture the repository state and writes the
-result to `releases/hangman-v1.0.0.zip`. It refuses to run if there are
+result to `releases/hangman-v1.1.0.zip`. It refuses to run if there are
 uncommitted changes unless you supply `--allow-dirty`. Use `--output-dir` to
 change where the archive is stored. To publish a specific tag or branch instead
 of `HEAD`, provide `--ref <git-ref>`.
 
-After publishing, the script writes a `hangman-v1.0.0.zip.sha256` file in the
+After publishing, the script writes a `hangman-v1.1.0.zip.sha256` file in the
 same directory with a ready-to-share SHA256 checksum for downstream
 verification.
 
