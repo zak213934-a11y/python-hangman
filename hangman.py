@@ -219,7 +219,9 @@ def _positive_attempts(value: str) -> int:
 
     attempts = int(value)
     if attempts <= 0:
-        raise argparse.ArgumentTypeError("attempts must be a positive integer")
+        raise argparse.ArgumentTypeError(
+            "Allowed attempts must be positive. attempts must be a positive integer."
+        )
     return attempts
 
 
