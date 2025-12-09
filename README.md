@@ -32,6 +32,11 @@ The build places `dist/hangman.pyz` alongside the project. Launch it with
 The `dist/` directory is gitignored, so generate the archive locally when
 you need to ship it.
 
+After building, you can validate the archive in a clean environment by creating
+a virtualenv with only Python installed and running the zipapp against a small
+custom word list. This mirrors the release smoke tests captured in
+`RELEASE_NOTES.md`.
+
 ## Testing
 
 Run the unit tests with:
@@ -54,9 +59,18 @@ uncommitted changes unless you supply `--allow-dirty`. Use `--output-dir` to
 change where the archive is stored. To publish a specific tag or branch instead
 of `HEAD`, provide `--ref <git-ref>`.
 
+After publishing, record the archive checksum (e.g., `sha256sum releases/hangman-v1.0.0.zip`)
+for downstream verification.
+
 If you plan to lint or run the publishing workflow locally, install the dev
 tooling first:
 
 ```bash
 pip install -r requirements-dev.txt
 ```
+
+## Release notes and validation
+
+See `RELEASE_NOTES.md` for a summary of gameplay/CLI changes, packaging
+updates, and the manual and automated validation performed (including tested
+Python versions).
