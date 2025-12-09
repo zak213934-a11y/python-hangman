@@ -59,8 +59,9 @@ uncommitted changes unless you supply `--allow-dirty`. Use `--output-dir` to
 change where the archive is stored. To publish a specific tag or branch instead
 of `HEAD`, provide `--ref <git-ref>`.
 
-After publishing, record the archive checksum (e.g., `sha256sum releases/hangman-v1.0.0.zip`)
-for downstream verification.
+After publishing, the script writes a `hangman-v1.0.0.zip.sha256` file in the
+same directory with a ready-to-share SHA256 checksum for downstream
+verification.
 
 If you plan to lint or run the publishing workflow locally, install the dev
 tooling first:
