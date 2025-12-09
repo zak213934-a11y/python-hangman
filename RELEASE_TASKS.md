@@ -16,7 +16,7 @@
 - [x] Ensure the working tree is clean before publishing (or intentionally use `--allow-dirty`). (Verified clean working tree via `git status -sb`.)
 - [x] Run `python publish_release.py <version>` to produce the release ZIP. (Published `releases/hangman-v1.0.0.zip` via `python publish_release.py v1.0.0`.)
 - [x] Confirm the output lands in `releases/` (or the chosen directory) and matches the expected filename format `hangman-<version>.zip`. (Archive path: `releases/hangman-v1.0.0.zip`.)
-- [x] Capture checksum (e.g., `sha256sum`) for the generated archive for later verification. (SHA256: `775ad1aedc02d1553db2aedde3a064650fa6e856537746f3b7e5485909757457`.)
+- [x] Capture checksum (e.g., `sha256sum`) for the generated archive for later verification. (SHA256: `775ad1aedc02d1553db2aedde3a064650fa6e856537746f3b7e5485909757457`; now written automatically to `hangman-v1.0.0.zip.sha256`.)
 
 ## Documentation and communication
 - [x] Update release notes or changelog with gameplay, option, and packaging changes included in the build. (Documented in `RELEASE_NOTES.md`, covering CLI validation, packaging workflows, and compatibility.)

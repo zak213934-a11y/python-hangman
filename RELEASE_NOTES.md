@@ -7,7 +7,7 @@
 
 ## Packaging changes
 - Provides a reproducible zipapp build via `python build_pyz.py`, producing `dist/hangman.pyz`.
-- Adds a publishing workflow through `python publish_release.py <version>` that writes `releases/hangman-<version>.zip` and captures a SHA256 checksum for verification (`hangman-v1.0.0.zip` at commit time).
+- Adds a publishing workflow through `python publish_release.py <version>` that writes `releases/hangman-<version>.zip` and records a SHA256 checksum alongside the archive (`hangman-v1.0.0.zip` at commit time).
 
 ## Validation summary
 - Automated tests: `python -m pytest` (Python 3.11).
