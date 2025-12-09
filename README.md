@@ -1,77 +1,40 @@
 # Python Hangman
 
-A simple command-line Hangman game written in Python.
+A lightweight command-line Hangman game with configurable word sources and attempt limits.
 
-## Branching
-
-All prior feature branches have been consolidated. The `main` branch now tracks
-the up-to-date codebase and should be used for all future work.
-
-## How to Play
-
-1. Run `python hangman.py`.
-2. Guess one letter at a time when prompted.
-3. You win by revealing the secret word before running out of attempts.
+## Quick start
+- Run the game: `python hangman.py`
+- Guess one letter at a time; win by revealing the word before attempts run out.
 
 ## Options
+- `--word-file PATH`: use a newline-delimited list of candidate words.
+- `--attempts N`: set the number of allowed wrong guesses (default matches the included ASCII art).
 
-- `--word-file PATH`: Provide a newline-delimited list of words to draw from.
-- `--attempts N`: Override the number of allowed wrong guesses (default matches the hangman art).
-
-## Building a distributable zipapp
-
-If network restrictions block installing PyInstaller, you can still ship a
-single-file archive that runs on any machine with Python 3 installed:
-
+## Distribution
+Build a single-file zipapp when PyInstaller isn’t available:
 ```bash
 python build_pyz.py
 ```
-
-The build places `dist/hangman.pyz` alongside the project. Launch it with
-`python dist/hangman.pyz [options]` and distribute that file to end users.
-The `dist/` directory is gitignored, so generate the archive locally when
-you need to ship it.
-
-After building, you can validate the archive in a clean environment by creating
-a virtualenv with only Python installed and running the zipapp against a small
-custom word list. This mirrors the release smoke tests captured in
-`RELEASE_NOTES.md`.
+The archive is written to `dist/hangman.pyz`; run it with `python dist/hangman.pyz [options]`. The `dist/` directory is gitignored, so generate it locally as needed.
 
 ## Testing
-
-Run the unit tests with:
-
+Run unit tests with:
 ```bash
 python -m pytest
 ```
 
-## Publishing a release archive
-
-Create a zip of the current `HEAD` revision with:
-
+## Release packaging
+Create a versioned source archive:
 ```bash
 python publish_release.py v1.1.0
 ```
+The script emits `releases/hangman-v1.1.0.zip` (with a matching `.sha256`), refuses to run with uncommitted changes unless `--allow-dirty` is provided, and supports publishing specific refs via `--ref <git-ref>`. Use `--output-dir` to choose the destination.
 
-The script uses `git archive` to capture the repository state and writes the
-result to `releases/hangman-v1.1.0.zip`. It refuses to run if there are
-uncommitted changes unless you supply `--allow-dirty`. Use `--output-dir` to
-change where the archive is stored. To publish a specific tag or branch instead
-of `HEAD`, provide `--ref <git-ref>`.
-
-After publishing, the script writes a `hangman-v1.1.0.zip.sha256` file in the
-same directory with a ready-to-share SHA256 checksum for downstream
-verification.
-
-If you plan to lint or run the publishing workflow locally, install the dev
-tooling first:
-
+## Dev setup
+Install optional tooling (linters, publish helpers) with:
 ```bash
 pip install -r requirements-dev.txt
 ```
 
-## Release notes and validation
-
-See `RELEASE_NOTES.md` for a summary of gameplay/CLI changes, packaging
-updates, and the manual and automated validation performed (including tested
-Python versions).
+## Release notes
+For gameplay/CLI changes and validation details (including tested Python versions), see `RELEASE_NOTES.md`.
