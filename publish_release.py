@@ -10,6 +10,7 @@ can override the location with ``--output-dir`` and choose any tag or branch via
 from __future__ import annotations
 
 import argparse
+import hashlib
 import subprocess
 import sys
 from pathlib import Path
@@ -59,12 +60,30 @@ def create_release_archive(
     return archive_path
 
 
+def write_sha256_checksum(archive_path: Path) -> Path:
+    """Compute and write a SHA256 checksum file for ``archive_path``.
+
+    The checksum is written next to the archive using the ``<name>.sha256``
+    format with ``sha256sum``-compatible contents.
+    """
+
+    digest = hashlib.sha256()
+    with archive_path.open("rb") as fp:
+        for chunk in iter(lambda: fp.read(1024 * 1024), b""):
+            digest.update(chunk)
+
+    checksum = digest.hexdigest()
+    checksum_path = archive_path.with_suffix(archive_path.suffix + ".sha256")
+    checksum_path.write_text(f"{checksum}  {archive_path.name}\n")
+    return checksum_path
+
+
 def main() -> None:
     """Parse CLI arguments and create a release archive."""
 
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
-        "version", help="Version label for the release archive (e.g. v1.0.0)"
+        "version", help="Version label for the release archive (e.g. v1.1.0)"
     )
     parser.add_argument(
         "--ref",
@@ -88,6 +107,7 @@ def main() -> None:
         archive_path = create_release_archive(
             args.version, args.output_dir, args.allow_dirty, ref=args.ref
         )
+        checksum_path = write_sha256_checksum(archive_path)
     except subprocess.CalledProcessError as err:
         print(f"Failed to archive git reference '{args.ref}': {err}", file=sys.stderr)
         raise SystemExit(1) from err
@@ -96,6 +116,7 @@ def main() -> None:
         raise SystemExit(1) from err
 
     print(f"Release archive created at {archive_path}")
+    print(f"SHA256 checksum written to {checksum_path}")
 
 
 if __name__ == "__main__":
