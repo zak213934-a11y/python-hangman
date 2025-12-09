@@ -1,16 +1,16 @@
 # Remaining Tasks for Hangman Release
 
 ## Quality and gameplay validation
-- [ ] Run the automated test suite (`python -m pytest`) and resolve any failures, including CLI error text expectations.
-- [ ] Perform manual playtests covering both win and loss paths, ensuring invalid guesses are rejected and remaining attempts decrement correctly.
-- [ ] Verify CLI options still work: loading words from a custom file, enforcing positive attempt counts, and choosing secrets from the provided list.
-- [ ] Confirm default word list still produces winnable rounds within the allotted attempts.
+- [x] Run the automated test suite (`python -m pytest`) and resolve any failures, including CLI error text expectations. (Pass on Python 3.11 via `python -m pytest`.)
+- [x] Perform manual playtests covering both win and loss paths, ensuring invalid guesses are rejected and remaining attempts decrement correctly. (Win path with custom word file + 6 attempts; loss path with custom word file + 3 attempts including invalid numeric guess rejection.)
+- [x] Verify CLI options still work: loading words from a custom file, enforcing positive attempt counts, and choosing secrets from the provided list. (Custom file paths honored; non-positive attempts rejected; secrets chosen from provided list.)
+- [x] Confirm default word list still produces winnable rounds within the allotted attempts. (Deterministic selection with seeded RNG wins using default allowed attempts.)
 
 ## Packaging and distribution
-- [ ] Build the distributable zipapp (`python build_pyz.py`).
-- [ ] Smoke-test `dist/hangman.pyz` with default settings plus a custom word file/attempt limit.
+- [x] Build the distributable zipapp (`python build_pyz.py`).
+- [x] Smoke-test `dist/hangman.pyz` with default settings plus a custom word file/attempt limit. (Default flow exercised; custom word file + attempt cap validated.)
 - [ ] Validate the archive runs on a clean environment with only Python 3 installed (no dev dependencies).
-- [ ] Record the Python versions the artifact was tested against.
+- [x] Record the Python versions the artifact was tested against. (Tested on Python 3.11.)
 
 ## Release packaging workflow
 - [ ] Ensure the working tree is clean before publishing (or intentionally use `--allow-dirty`).
