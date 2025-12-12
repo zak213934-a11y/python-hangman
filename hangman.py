@@ -254,12 +254,12 @@ class Button:
     """Simple button class for pygame."""
 
     def __init__(
-        self, x: int, y: int, width: int, height: int, text: str, color: tuple
-    ) -> None:  # pylint: disable=too-many-arguments,too-many-positional-arguments
+        self, pos: tuple[int, int], size: tuple[int, int], text: str, color: tuple
+    ) -> None:
         if not PYGAME_AVAILABLE:  # pragma: no cover - GUI guard
             raise RuntimeError("pygame is required to create buttons")
 
-        self.rect = pygame.Rect(x, y, width, height)
+        self.rect = pygame.Rect(*pos, *size)
         self.text = text
         self.color = color
         self.hover_color = tuple(min(c + 30, 255) for c in color)
@@ -291,7 +291,7 @@ class LetterButton(Button):
     """Button for letter selection."""
 
     def __init__(self, x: int, y: int, letter: str):
-        super().__init__(x, y, 50, 50, letter.upper(), BLUE)
+        super().__init__((x, y), (50, 50), letter.upper(), BLUE)
         self.letter = letter
         self.disabled = False
 
@@ -342,26 +342,40 @@ class HangmanDrawing:
         pygame.draw.line(
             screen, BLACK, (self.x + 20, self.y + 200), (self.x + 20, self.y), 5
         )  # Pole
-        pygame.draw.line(screen, BLACK, (self.x + 20, self.y), (self.x + 100, self.y), 5)
-        pygame.draw.line(screen, BLACK, (self.x + 100, self.y), (self.x + 100, self.y + 30), 3)
+        pygame.draw.line(
+            screen, BLACK, (self.x + 20, self.y), (self.x + 100, self.y), 5
+        )
+        pygame.draw.line(
+            screen, BLACK, (self.x + 100, self.y), (self.x + 100, self.y + 30), 3
+        )
 
         if wrong_count >= 1:  # Head
             pygame.draw.circle(screen, RED, (self.x + 100, self.y + 50), 20, 3)
 
         if wrong_count >= 2:  # Body
-            pygame.draw.line(screen, RED, (self.x + 100, self.y + 70), (self.x + 100, self.y + 130), 3)
+            pygame.draw.line(
+                screen, RED, (self.x + 100, self.y + 70), (self.x + 100, self.y + 130), 3
+            )
 
         if wrong_count >= 3:  # Left arm
-            pygame.draw.line(screen, RED, (self.x + 100, self.y + 85), (self.x + 70, self.y + 105), 3)
+            pygame.draw.line(
+                screen, RED, (self.x + 100, self.y + 85), (self.x + 70, self.y + 105), 3
+            )
 
         if wrong_count >= 4:  # Right arm
-            pygame.draw.line(screen, RED, (self.x + 100, self.y + 85), (self.x + 130, self.y + 105), 3)
+            pygame.draw.line(
+                screen, RED, (self.x + 100, self.y + 85), (self.x + 130, self.y + 105), 3
+            )
 
         if wrong_count >= 5:  # Left leg
-            pygame.draw.line(screen, RED, (self.x + 100, self.y + 130), (self.x + 75, self.y + 170), 3)
+            pygame.draw.line(
+                screen, RED, (self.x + 100, self.y + 130), (self.x + 75, self.y + 170), 3
+            )
 
         if wrong_count >= 6:  # Right leg
-            pygame.draw.line(screen, RED, (self.x + 100, self.y + 130), (self.x + 125, self.y + 170), 3)
+            pygame.draw.line(
+                screen, RED, (self.x + 100, self.y + 130), (self.x + 125, self.y + 170), 3
+            )
 
 
 class HangmanGUI:  # pylint: disable=too-many-instance-attributes
@@ -429,8 +443,9 @@ class HangmanGUI:  # pylint: disable=too-many-instance-attributes
         self.screen.blit(title, title_rect)
 
         if NLTK_AVAILABLE:
+            word_count = len(self.word_manager.word_cache[self.difficulty])
             subtitle = self.tiny_font.render(
-                f"Powered by NLTK - {len(self.word_manager.word_cache[self.difficulty])} words available",
+                f"Powered by NLTK - {word_count} words available",
                 True,
                 GRAY,
             )
@@ -451,7 +466,8 @@ class HangmanGUI:  # pylint: disable=too-many-instance-attributes
 
         diff_buttons = []
         for i, (diff, color) in enumerate(zip(difficulties, colors)):
-            btn = Button(SCREEN_WIDTH // 2 - 150, y_pos + i * 80, 300, 60, diff, color)
+            btn_pos = (SCREEN_WIDTH // 2 - 150, y_pos + i * 80)
+            btn = Button(btn_pos, (300, 60), diff, color)
 
             if diff == self.difficulty:
                 pygame.draw.rect(
@@ -468,10 +484,11 @@ class HangmanGUI:  # pylint: disable=too-many-instance-attributes
                 True,
                 DARK_GRAY,
             )
-            info_rect = info.get_rect(center=(SCREEN_WIDTH // 2, y_pos + i * 80 + 75))
+            center_y = y_pos + i * 80 + 75
+            info_rect = info.get_rect(center=(SCREEN_WIDTH // 2, center_y))
             self.screen.blit(info, info_rect)
 
-        start_btn = Button(SCREEN_WIDTH // 2 - 100, 580, 200, 60, "START GAME", BLUE)
+        start_btn = Button((SCREEN_WIDTH // 2 - 100, 580), (200, 60), "START GAME", BLUE)
         start_btn.draw(self.screen, self.large_font)
 
         if self.games_played > 0:
@@ -532,10 +549,8 @@ class HangmanGUI:  # pylint: disable=too-many-instance-attributes
         self.screen.blit(score_surf, (SCREEN_WIDTH - 200, 10))
 
         hint_btn = Button(
-            SCREEN_WIDTH - 150,
-            SCREEN_HEIGHT - 70,
-            130,
-            50,
+            (SCREEN_WIDTH - 150, SCREEN_HEIGHT - 70),
+            (130, 50),
             f"HINT ({3 - self.game.hints_used})",
             ORANGE,
         )
@@ -632,8 +647,8 @@ class HangmanGUI:  # pylint: disable=too-many-instance-attributes
         stats_rect = stats_surf.get_rect(center=(SCREEN_WIDTH // 2, 440))
         self.screen.blit(stats_surf, stats_rect)
 
-        play_again_btn = Button(SCREEN_WIDTH // 2 - 250, 520, 200, 60, "PLAY AGAIN", GREEN)
-        menu_btn = Button(SCREEN_WIDTH // 2 + 50, 520, 200, 60, "MAIN MENU", BLUE)
+        play_again_btn = Button((SCREEN_WIDTH // 2 - 250, 520), (200, 60), "PLAY AGAIN", GREEN)
+        menu_btn = Button((SCREEN_WIDTH // 2 + 50, 520), (200, 60), "MAIN MENU", BLUE)
 
         play_again_btn.draw(self.screen, self.medium_font)
         menu_btn.draw(self.screen, self.medium_font)
