@@ -11,7 +11,7 @@ from __future__ import annotations
 
 import random
 import sys
-from typing import TYPE_CHECKING, Sequence
+from typing import TYPE_CHECKING
 
 try:  # Optional import so test environments without pygame still work.
     import pygame
@@ -135,9 +135,14 @@ class WordManager:
                 word for word in all_words if min_len <= len(word) <= max_len
             ]
 
-        for difficulty in self.word_cache:
-            if not self.word_cache[difficulty]:
+        for difficulty, words in self.word_cache.items():
+            if not words:
                 self.word_cache[difficulty] = DEFAULT_WORDS
+
+    def available_difficulties(self) -> tuple[str, ...]:
+        """Return the configured difficulty levels."""
+
+        return tuple(self.word_cache.keys())
 
     def get_word(self, difficulty: str = "MEDIUM") -> str:
         """Get a random word for the specified difficulty."""
@@ -158,8 +163,7 @@ class HangmanGame:
 
         self.secret_word = secret_word.lower()
         self.difficulty = difficulty
-        self.settings = DIFFICULTY_SETTINGS[difficulty]
-        self.max_attempts = self.settings["max_attempts"]
+        self.max_attempts = DIFFICULTY_SETTINGS[difficulty]["max_attempts"]
 
         self.guessed_letters: set[str] = set()
         self.wrong_guesses: set[str] = set()
@@ -249,7 +253,9 @@ class HangmanGame:
 class Button:
     """Simple button class for pygame."""
 
-    def __init__(self, x: int, y: int, width: int, height: int, text: str, color: tuple):
+    def __init__(
+        self, x: int, y: int, width: int, height: int, text: str, color: tuple
+    ) -> None:  # pylint: disable=too-many-arguments,too-many-positional-arguments
         if not PYGAME_AVAILABLE:  # pragma: no cover - GUI guard
             raise RuntimeError("pygame is required to create buttons")
 
@@ -321,6 +327,12 @@ class HangmanDrawing:
         self.x = x
         self.y = y
 
+    def set_position(self, x: int, y: int) -> None:
+        """Move the drawing origin to a new coordinate."""
+
+        self.x = x
+        self.y = y
+
     def draw(self, screen: "_pygame.Surface", wrong_count: int) -> None:
         """Draw hangman based on wrong guess count."""
 
@@ -352,7 +364,7 @@ class HangmanDrawing:
             pygame.draw.line(screen, RED, (self.x + 100, self.y + 130), (self.x + 125, self.y + 170), 3)
 
 
-class HangmanGUI:
+class HangmanGUI:  # pylint: disable=too-many-instance-attributes
     """Main GUI for the Hangman game."""
 
     def __init__(self):
@@ -407,7 +419,7 @@ class HangmanGUI:
         for button in self.letter_buttons:
             button.disabled = False
 
-    def draw_menu(self) -> bool:
+    def draw_menu(self) -> bool:  # pylint: disable=too-many-locals
         """Draw the main menu."""
 
         self.screen.fill(WHITE)
@@ -484,7 +496,7 @@ class HangmanGUI:
 
         return True
 
-    def draw_game(self) -> bool:
+    def draw_game(self) -> bool:  # pylint: disable=too-many-locals,too-many-branches
         """Draw the active game."""
 
         if not self.game:
@@ -520,7 +532,12 @@ class HangmanGUI:
         self.screen.blit(score_surf, (SCREEN_WIDTH - 200, 10))
 
         hint_btn = Button(
-            SCREEN_WIDTH - 150, SCREEN_HEIGHT - 70, 130, 50, f"HINT ({3 - self.game.hints_used})", ORANGE
+            SCREEN_WIDTH - 150,
+            SCREEN_HEIGHT - 70,
+            130,
+            50,
+            f"HINT ({3 - self.game.hints_used})",
+            ORANGE,
         )
         if self.game.hints_used >= 3:
             hint_btn.color = GRAY
@@ -572,7 +589,7 @@ class HangmanGUI:
                 button.disabled = True
                 break
 
-    def draw_game_over(self) -> bool:
+    def draw_game_over(self) -> bool:  # pylint: disable=too-many-locals
         """Draw game over screen."""
 
         if not self.game:
@@ -651,7 +668,7 @@ class HangmanGUI:
         pygame.quit()
 
 
-def main(argv: Sequence[str] | None = None) -> None:  # noqa: ARG001
+def main() -> None:
     """Entry point for the game."""
 
     if not PYGAME_AVAILABLE:

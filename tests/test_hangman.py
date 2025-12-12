@@ -57,15 +57,19 @@ def test_word_manager_respects_difficulty_lengths(monkeypatch: pytest.MonkeyPatc
     mock_words = ["hat", "python", "encyclopedia", "keyboard", "loop"]
 
     class FakeCorpus:
+        """Minimal stand-in for the NLTK words corpus."""
+
         @staticmethod
         def words() -> list[str]:
             return mock_words
 
     class FakeNltk:
+        """Minimal stand-in for the nltk package."""
+
         corpus = FakeCorpus()
 
         @staticmethod
-        def download(_name: str, quiet: bool = True) -> None:  # pragma: no cover - noop helper
+        def download(_name: str, _quiet: bool = True) -> None:  # pragma: no cover - noop helper
             return None
 
     monkeypatch.setattr("hangman.NLTK_AVAILABLE", True)
