@@ -40,8 +40,9 @@ Prefer a single file? Build or download the zipapp (`dist/hangman.pyz`) and run 
 ## Testing
 The core game logic is independent of `pygame` so tests can run headless:
 ```bash
-python -m pytest
+python build_pyz.py
 ```
+The archive is written to `dist/hangman.pyz`; run it with `python dist/hangman.pyz`.
 
 ## Distribution
 Build a single-file zipapp when PyInstaller isn’t available:
