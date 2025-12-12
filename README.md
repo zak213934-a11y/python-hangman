@@ -1,27 +1,39 @@
-# Python Hangman
+# Pygame Hangman
 
-A lightweight command-line Hangman game with configurable word sources and attempt limits.
+A graphical Hangman experience built with `pygame`, featuring difficulty levels, a hint system, and scoring. It also supports the NLTK words corpus for a large dictionary but gracefully falls back to a bundled list.
 
 ## Quick start
+- Install dependencies (pygame is required for the GUI):
+  ```bash
+  pip install pygame
+  # Optional: nltk for a larger word list
+  pip install nltk
+  python - <<'PY'
+  import nltk
+  nltk.download('words')
+  PY
+  ```
 - Run the game: `python hangman.py`
-- Guess one letter at a time; win by revealing the word before attempts run out.
 
-## Options
-- `--word-file PATH`: use a newline-delimited list of candidate words.
-- `--attempts N`: set the number of allowed wrong guesses (default matches the included ASCII art).
+## Features
+- Three difficulty levels that adjust word length, attempts, and hint costs.
+- Hint button reveals random letters (up to three hints per game) and affects score.
+- Dynamic scoring that rewards remaining attempts and difficulty multipliers.
+- Fallback word list when NLTK is unavailable.
+- GUI ready for future sound effects and polish.
+
+## Testing
+The core game logic is independent of `pygame` so tests can run headless:
+```bash
+python -m pytest
+```
 
 ## Distribution
 Build a single-file zipapp when PyInstaller isn’t available:
 ```bash
 python build_pyz.py
 ```
-The archive is written to `dist/hangman.pyz`; run it with `python dist/hangman.pyz [options]`. The `dist/` directory is gitignored, so generate it locally as needed.
-
-## Testing
-Run unit tests with:
-```bash
-python -m pytest
-```
+The archive is written to `dist/hangman.pyz`; run it with `python dist/hangman.pyz`.
 
 ## Release packaging
 Create a versioned source archive:
@@ -37,4 +49,4 @@ pip install -r requirements-dev.txt
 ```
 
 ## Release notes
-For gameplay/CLI changes and validation details (including tested Python versions), see `RELEASE_NOTES.md`.
+For gameplay changes and validation details, see `RELEASE_NOTES.md`.

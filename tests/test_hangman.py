@@ -1,90 +1,105 @@
-"""Unit tests for the Hangman game logic."""
+"""Unit tests for the Hangman game logic and helpers."""
 
 from __future__ import annotations
 
-import random
-from pathlib import Path
-import subprocess
-import sys
-
 import pytest
 
-from hangman import HangmanGame, choose_word, load_words_from_file
+from hangman import DIFFICULTY_SETTINGS, HangmanGame, WordManager
 
 
-def test_hangman_game_win_flow() -> None:
-    """Verify a perfect set of guesses wins without consuming attempts."""
+def test_hangman_game_flow_tracks_state() -> None:
+    """A sequence of guesses should advance win/loss state appropriately."""
 
-    game = HangmanGame("code", allowed_attempts=6)
-    for letter in "code":
-        assert game.guess(letter) is True
+    game = HangmanGame("code", difficulty="MEDIUM")
+    assert game.remaining_attempts == DIFFICULTY_SETTINGS["MEDIUM"]["max_attempts"]
+
+    assert game.guess("c") is True
+    assert game.guess("x") is False
+    assert "x" in game.wrong_guesses
+    assert game.remaining_attempts == DIFFICULTY_SETTINGS["MEDIUM"]["max_attempts"] - 1
+
+    assert game.guess("o") is True
+    assert game.guess("d") is True
+    assert game.guess("e") is True
     assert game.is_won()
     assert not game.is_lost()
-    assert game.remaining_attempts == 6
+    assert game.game_over()
 
 
-def test_hangman_game_duplicate_guess_raises() -> None:
-    """Ensure repeating a guess raises a ValueError."""
+def test_guess_rejects_invalid_letters() -> None:
+    """Invalid inputs should not change guessed letters or attempts."""
 
-    game = HangmanGame("python", allowed_attempts=6)
-    game.guess("p")
-    with pytest.raises(ValueError):
-        game.guess("p")
-    game.guess("y")
-    with pytest.raises(ValueError):
-        game.guess("y")
+    game = HangmanGame("python")
 
-
-def test_guess_requires_single_alpha_character() -> None:
-    """Reject guesses that are not a single alphabetic character."""
-
-    game = HangmanGame("test")
     for invalid in ("", "ab", "1", "!", "abc"):
-        with pytest.raises(ValueError):
-            game.guess(invalid)
+        assert game.guess(invalid) is False
+
+    assert not game.guessed_letters
+    assert not game.wrong_guesses
+    assert game.remaining_attempts == DIFFICULTY_SETTINGS["MEDIUM"]["max_attempts"]
 
 
-def test_choose_word_uses_rng() -> None:
-    """Pick a deterministic word when seeded RNG is provided."""
+def test_hints_reveal_letters_and_affect_score() -> None:
+    """Using hints should reveal letters, increment hint counters, and reduce score."""
 
-    rng = random.Random(123)
-    word = choose_word(["alpha", "beta", "gamma"], rng)
-    assert word == "alpha"
+    game = HangmanGame("banana", difficulty="EASY")
+    initial_score = game.score
 
-
-def test_load_words_from_file_filters_non_alpha(tmp_path: Path) -> None:
-    """Keep only alphabetic words from a provided file."""
-
-    content = "Alpha\nBeta\n123\n \nGamma!\n"
-    word_file = tmp_path / "words.txt"
-    word_file.write_text(content, encoding="utf-8")
-
-    loaded = load_words_from_file(word_file)
-    assert loaded == ["Alpha", "Beta"]
+    assert game.get_hint() is True
+    assert game.hints_used == 1
+    assert len(game.revealed_hints) == 1
+    assert game.score < initial_score
 
 
-def test_load_words_from_file_requires_words(tmp_path: Path) -> None:
-    """Fail when no alphabetic words are found in the file."""
+def test_word_manager_respects_difficulty_lengths(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Words should be filtered into difficulty buckets by length."""
 
-    word_file = tmp_path / "empty.txt"
-    word_file.write_text("123\n!@#\n", encoding="utf-8")
+    mock_words = ["hat", "python", "encyclopedia", "keyboard", "loop"]
 
-    with pytest.raises(ValueError):
-        load_words_from_file(word_file)
+    class FakeCorpus:  # pylint: disable=too-few-public-methods
+        """Minimal stand-in for the NLTK words corpus."""
+
+        @staticmethod
+        def words() -> list[str]:
+            """Return a curated list of mock words."""
+
+            return mock_words
+
+    class FakeNltk:  # pylint: disable=too-few-public-methods
+        """Minimal stand-in for the nltk package."""
+
+        corpus = FakeCorpus()
+
+        @staticmethod
+        def download(_name: str, _quiet: bool = True) -> None:  # pragma: no cover - noop helper
+            """Pretend to download the corpus without touching the network."""
+
+            return None
+
+    monkeypatch.setattr("hangman.NLTK_AVAILABLE", True)
+    monkeypatch.setattr("hangman.nltk", FakeNltk)
+    monkeypatch.setattr("hangman.nltk_words", FakeCorpus())
+
+    manager = WordManager()
+
+    for word in manager.word_cache["EASY"]:
+        assert DIFFICULTY_SETTINGS["EASY"]["min_length"] <= len(word) <= DIFFICULTY_SETTINGS["EASY"]["max_length"]
+
+    for word in manager.word_cache["HARD"]:
+        assert DIFFICULTY_SETTINGS["HARD"]["min_length"] <= len(word) <= DIFFICULTY_SETTINGS["HARD"]["max_length"]
 
 
-def test_cli_rejects_non_positive_attempts(tmp_path: Path) -> None:
-    """Exit gracefully when provided a non-positive attempts value."""
+def test_score_awards_bonus_for_attempts_left() -> None:
+    """Scores should scale with remaining attempts and difficulty."""
 
-    script_path = Path(__file__).resolve().parent.parent / "hangman.py"
-    result = subprocess.run(
-        [sys.executable, str(script_path), "--attempts", "0"],
-        capture_output=True,
-        text=True,
-        cwd=tmp_path,
-        check=False,
-    )
+    game = HangmanGame("quiz", difficulty="HARD")
+    game.guess("q")
+    game.guess("u")
+    game.guess("i")
+    game.guess("z")
 
-    assert result.returncode == 2
-    assert "attempts must be a positive integer" in result.stderr
-    assert "Traceback" not in result.stderr
+    expected_base = len("quiz") * 10
+    attempts_bonus = game.remaining_attempts * 5
+    hint_penalty = 0
+    difficulty_multiplier = 2
+    assert game.score == int((expected_base + attempts_bonus - hint_penalty) * difficulty_multiplier)
