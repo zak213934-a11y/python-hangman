@@ -15,6 +15,21 @@ A graphical Hangman experience built with `pygame`, featuring difficulty levels,
   ```
 - Run the game: `python hangman.py`
 
+## Run the latest release (simplest path)
+1. Grab the newest archive from `releases/` (for example, `releases/hangman-v1.1.0.zip`).
+2. Unzip it anywhere you like—the package contains `hangman.py` and supporting files.
+3. Install pygame in your current Python environment:
+   ```bash
+   pip install pygame
+   ```
+   (Optionally add `nltk` and download the `words` corpus for a larger dictionary.)
+4. Launch the game from the extracted folder:
+   ```bash
+   python hangman.py
+   ```
+
+Prefer a single file? Build or download the zipapp (`dist/hangman.pyz`) and run it with `python dist/hangman.pyz` after installing `pygame`.
+
 ## Features
 - Three difficulty levels that adjust word length, attempts, and hint costs.
 - Hint button reveals random letters (up to three hints per game) and affects score.
@@ -25,8 +40,9 @@ A graphical Hangman experience built with `pygame`, featuring difficulty levels,
 ## Testing
 The core game logic is independent of `pygame` so tests can run headless:
 ```bash
-python -m pytest
+python build_pyz.py
 ```
+The archive is written to `dist/hangman.pyz`; run it with `python dist/hangman.pyz`.
 
 ## Distribution
 Build a single-file zipapp when PyInstaller isn’t available:
