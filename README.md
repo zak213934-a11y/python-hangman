@@ -1,5 +1,6 @@
 
-````md
+![Pygame Hangman Banner](assets/banner.png)````
+md
 # 🎮 Pygame Hangman
 ![Latest Release](https://img.shields.io/github/v/release/zak213934-a11y/python-hangman)
 ![Release Date](https://img.shields.io/github/release-date/zak213934-a11y/python-hangman)
