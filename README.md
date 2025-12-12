@@ -1,68 +1,235 @@
-# Pygame Hangman
 
-A graphical Hangman experience built with `pygame`, featuring difficulty levels, a hint system, and scoring. It also supports the NLTK words corpus for a large dictionary but gracefully falls back to a bundled list.
+````md
+# 🎮 Pygame Hangman
+![Latest Release](https://img.shields.io/github/v/release/zak213934-a11y/python-hangman)
+![Release Date](https://img.shields.io/github/release-date/zak213934-a11y/python-hangman)
+![Downloads](https://img.shields.io/github/downloads/zak213934-a11y/python-hangman/total)
+![Repo Size](https://img.shields.io/github/repo-size/zak213934-a11y/python-hangman)
+![License](https://img.shields.io/github/license/zak213934-a11y/python-hangman)
 
-## Quick start
-- Install dependencies (pygame is required for the GUI):
-  ```bash
-  pip install pygame
-  # Optional: nltk for a larger word list
-  pip install nltk
-  python - <<'PY'
-  import nltk
-  nltk.download('words')
-  PY
-  ```
-- Run the game: `python hangman.py`
+A **graphical Hangman game** built with **Python + Pygame**, featuring **difficulty levels**, a **hint system**, and **scoring**.  
+Uses the **NLTK `words` corpus** for a large dictionary when available, with a built-in fallback word list.
 
-## Run the latest release (simplest path)
-1. Grab the newest archive from `releases/` (for example, `releases/hangman-v1.1.0.zip`).
-2. Unzip it anywhere you like—the package contains `hangman.py` and supporting files.
-3. Install pygame in your current Python environment:
-   ```bash
-   pip install pygame
-   ```
-   (Optionally add `nltk` and download the `words` corpus for a larger dictionary.)
-4. Launch the game from the extracted folder:
-   ```bash
-   python hangman.py
-   ```
+---
 
-Prefer a single file? Build or download the zipapp (`dist/hangman.pyz`) and run it with `python dist/hangman.pyz` after installing `pygame`.
+## 📌 Overview
 
-## Features
-- Three difficulty levels that adjust word length, attempts, and hint costs.
-- Hint button reveals random letters (up to three hints per game) and affects score.
-- Dynamic scoring that rewards remaining attempts and difficulty multipliers.
-- Fallback word list when NLTK is unavailable.
-- GUI ready for future sound effects and polish.
+Pygame Hangman is designed as both:
+- a **playable desktop game**, and
+- a **learning project** demonstrating clean game logic separation, testing, and packaging.
 
-## Testing
-The core game logic is independent of `pygame` so tests can run headless:
+The core logic can run **without Pygame**, making it easy to test and extend.
+
+---
+
+## ✨ Features
+
+- 🧩 **Three difficulty levels**
+  - Adjusts word length, allowed attempts, and scoring
+- 💡 **Hint system**
+  - Reveals random letters
+  - Limited to **3 hints per game**
+  - Each hint reduces final score
+- 🏁 **Dynamic scoring**
+  - Based on remaining attempts and difficulty multiplier
+- 📚 **Large dictionary support**
+  - Uses NLTK `words` corpus if installed
+  - Automatically falls back to bundled words if not
+- 🧪 **Testable game logic**
+  - Core mechanics run headless (no GUI required)
+
+---
+
+## 🚀 Quick Start
+
+### 1) Install requirements
+
+Pygame is required for the graphical interface:
+
+```bash
+pip install pygame
+````
+
+Optional but recommended (for a larger word list):
+
+```bash
+pip install nltk
+python - <<'PY'
+import nltk
+nltk.download('words')
+PY
+```
+
+---
+
+### 2) Run the game
+
+```bash
+python hangman.py
+```
+
+---
+
+## 🎮 Gameplay
+
+* Guess letters to uncover the hidden word
+* Incorrect guesses reduce remaining attempts
+* Use hints sparingly — they cost points
+* Win by guessing the word before attempts run out
+
+Difficulty selection affects:
+
+* Word length
+* Number of attempts
+* Score multiplier
+
+---
+
+## 🧪 Testing
+
+The game logic is independent of the Pygame UI.
+
+This allows:
+
+* Headless testing
+* Easier debugging
+* Cleaner separation of concerns
+
+Build the zipapp for testing or distribution:
+
 ```bash
 python build_pyz.py
 ```
-The archive is written to `dist/hangman.pyz`; run it with `python dist/hangman.pyz`.
 
-## Distribution
-Build a single-file zipapp when PyInstaller isn’t available:
+Output:
+
+```text
+dist/hangman.pyz
+```
+
+Run it with:
+
+```bash
+python dist/hangman.pyz
+```
+
+---
+
+## 📦 Distribution
+
+### Zipapp (single-file build)
+
+This project supports building a Python zipapp, useful when tools like PyInstaller are unavailable.
+
 ```bash
 python build_pyz.py
 ```
-The archive is written to `dist/hangman.pyz`; run it with `python dist/hangman.pyz`.
 
-## Release packaging
-Create a versioned source archive:
+Run with:
+
+```bash
+python dist/hangman.pyz
+```
+
+---
+
+## 🏷️ Release Packaging
+
+Create a versioned release archive:
+
 ```bash
 python publish_release.py v1.1.0
 ```
-The script emits `releases/hangman-v1.1.0.zip` (with a matching `.sha256`), refuses to run with uncommitted changes unless `--allow-dirty` is provided, and supports publishing specific refs via `--ref <git-ref>`. Use `--output-dir` to choose the destination.
 
-## Dev setup
-Install optional tooling (linters, publish helpers) with:
+This generates:
+
+* `releases/hangman-v1.1.0.zip`
+* `releases/hangman-v1.1.0.zip.sha256`
+
+Safety features:
+
+* Refuses to run with uncommitted changes (unless `--allow-dirty` is used)
+* Supports publishing a specific git ref with `--ref`
+* Custom output directories supported via `--output-dir`
+
+---
+
+## 🧑‍💻 Development Setup
+
+Install optional development tools:
+
 ```bash
 pip install -r requirements-dev.txt
 ```
 
-## Release notes
-For gameplay changes and validation details, see `RELEASE_NOTES.md`.
+Recommended uses:
+
+* Linting
+* Release automation
+* Testing helpers
+
+---
+
+## 📂 Project Structure (Simplified)
+
+```text
+.
+├── hangman.py
+├── build_pyz.py
+├── publish_release.py
+├── requirements-dev.txt
+├── tests/
+├── dist/
+├── releases/
+└── README.md
+```
+
+---
+
+## 📸 Screenshots
+
+To enhance the GitHub homepage, add screenshots or GIFs:
+
+```md
+![Gameplay Screenshot](assets/screenshot.png)
+```
+
+---
+
+## 📄 License
+
+Check the repository for license details.
+
+---
+
+## 👤 Author
+
+Zak
+[https://github.com/zak213934-a11y](https://github.com/zak213934-a11y)
+
+---
+
+## ⭐ Support
+
+If you find this project useful:
+
+* Star the repository
+* Fork it
+* Experiment and build on top of it
+
+---
+
+Happy hacking 🎉
+
+```
+
+---
+
+If you want next steps, I can:
+- Add **release badges** automatically linked to GitHub Releases  
+- Create a **matching banner image** for the repo  
+- Rewrite this for a **more “professional” or more “fun” tone**  
+- Generate a **CONTRIBUTING.md** to match the README  
+
+Just tell me which direction you want to take it.
+```
