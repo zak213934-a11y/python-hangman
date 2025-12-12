@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
+import os
 import subprocess
 import sys
+from pathlib import Path
 
 import pytest
 
@@ -12,11 +14,15 @@ import pytest
 def test_module_requires_pygame_when_missing() -> None:
     """Running the module without pygame should exit with an informative error."""
 
+    project_root = Path(__file__).resolve().parent.parent
+    env = {**os.environ, "PYTHONPATH": str(project_root / "src")}
+
     result = subprocess.run(
         [sys.executable, "-m", "hangman"],
         text=True,
         capture_output=True,
         check=False,
+        env=env,
     )
 
     assert result.returncode != 0
